@@ -1,0 +1,8 @@
+{
+  "app_username": "admin",
+  "app_password": "admin",
+  "jwt_secret": "change-me",
+  "jwt_algorithm": "HS256",
+  "jwt_expire_minutes": 60,
+  "log_level": "INFO"
+}
