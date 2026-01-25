@@ -8,7 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from src.agent.actions import ActionExecutor, ActionResult
 from src.agent.providers import LlmProvider
-from src.agent.retriever import Chunk, EmptyRetriever, KnowledgeRetriever
+from src.agent.retriever import Chunk, KnowledgeRetriever, LocalKeywordRetriever
 from src.core.config import Settings
 
 
@@ -37,7 +37,7 @@ class AgentRunner:
         top_k: int = 5,
     ) -> None:
         self._provider = provider
-        self._retriever = retriever or EmptyRetriever()
+        self._retriever = retriever or LocalKeywordRetriever("data")
         self._actions = actions or ActionExecutor()
         self._top_k = top_k
 
@@ -54,13 +54,13 @@ class AgentRunner:
                 actions=[],
             )
 
-        llm = self._provider.get_llm()
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
                     "你是一个智能体，请基于给定资料完成任务。"
-                    "只输出 JSON，包含 fields: summary, analysis_steps, actions, result, sources_used。",
+                    "只输出 JSON，不要包含任何解释或代码块。"
+                    "JSON fields: summary, analysis_steps, actions, result, sources_used。",
                 ),
                 (
                     "human",
@@ -70,6 +70,7 @@ class AgentRunner:
             ]
         )
         context = self._render_context(chunks)
+        llm = self._provider.get_llm()
         response = llm.invoke(prompt.format_messages(task=task, context=context))
         trace.append(self._trace("analyze", "success", "模型已返回结果"))
 
@@ -92,12 +93,25 @@ class AgentRunner:
         try:
             return json.loads(content)
         except json.JSONDecodeError as exc:
+            trimmed = self._extract_json(content)
+            if trimmed:
+                try:
+                    return json.loads(trimmed)
+                except json.JSONDecodeError as nested_exc:
+                    raise ValueError("模型返回非 JSON 内容") from nested_exc
             raise ValueError("模型返回非 JSON 内容") from exc
 
     def _normalize_sources(self, sources: list[str], chunks: list[Chunk]) -> list[str]:
         if sources:
             return [str(source) for source in sources]
         return [chunk.source for chunk in chunks]
+
+    def _extract_json(self, content: str) -> str | None:
+        start = content.find("{")
+        end = content.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            return None
+        return content[start : end + 1]
 
     def _trace(self, step: str, status: str, detail: str) -> TraceEntry:
         return TraceEntry(
@@ -112,4 +126,4 @@ def build_agent_runner(settings: Settings) -> AgentRunner:
     from src.agent.providers import build_provider
 
     provider = build_provider(settings)
-    return AgentRunner(provider=provider)
+    return AgentRunner(provider=provider, retriever=LocalKeywordRetriever("data"))

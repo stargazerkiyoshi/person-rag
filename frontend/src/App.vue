@@ -21,6 +21,14 @@ const navigateTo = () => {
     router.push('/login')
   }
 }
+
+const goAgent = () => {
+  if (!isAuthed.value) {
+    router.push('/login')
+    return
+  }
+  router.push('/agent')
+}
 </script>
 
 <template>
@@ -35,28 +43,25 @@ const navigateTo = () => {
           个人知识库的最小化 Web 入口
         </h1>
         <p class="mt-4 max-w-2xl text-lg text-slate-600">
-          用清爽的界面完成登录与身份验证，快速确认 API 工作状态，之后再扩展你的知识库体验。
+          用清晰的界面完成登录与身份验证，快速确认 API 工作状态，之后再扩展你的知识库体验。
         </p>
-        <div class="mt-6 flex flex-wrap items-center gap-3">
-          <button
-            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900"
-            type="button"
-            @click="navigateTo"
-          >
+        <a-space class="mt-6" wrap>
+          <a-button type="secondary" shape="round" @click="navigateTo">
             {{ isAuthed ? '前往个人信息' : '去登录' }}
-          </button>
-          <span v-if="isAuthed" class="text-sm text-slate-500">
+          </a-button>
+          <a-button type="outline" shape="round" @click="goAgent">
+            智能体对话
+          </a-button>
+          <a-tag v-if="isAuthed" color="gray" class="text-xs">
             当前路由：{{ route.path }}
-          </span>
-        </div>
+          </a-tag>
+        </a-space>
       </div>
     </header>
 
     <main class="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 pt-10 lg:grid-cols-[1.1fr,0.9fr]">
       <section class="space-y-6">
-        <div
-          class="reveal reveal-delay-1 rounded-3xl border border-white/50 bg-white/70 p-6 shadow-xl shadow-slate-200/60 backdrop-blur"
-        >
+        <a-card class="reveal reveal-delay-1" :bordered="false">
           <h2 class="font-display text-xl font-semibold text-slate-900">当前能力</h2>
           <ul class="mt-4 space-y-3 text-slate-600">
             <li class="flex items-start gap-3">
@@ -71,10 +76,14 @@ const navigateTo = () => {
               <span class="mt-1 h-2 w-2 rounded-full bg-sky-500"></span>
               支持设置 `VITE_API_BASE` 自定义后端地址。
             </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-1 h-2 w-2 rounded-full bg-indigo-500"></span>
+              提供智能体对话页，支持多轮对话展示与结果详情。
+            </li>
           </ul>
-        </div>
+        </a-card>
 
-        <div class="reveal reveal-delay-2 rounded-3xl border border-slate-200 bg-slate-900 px-6 py-5 text-slate-100 shadow-lg">
+        <a-card class="reveal reveal-delay-2" :bordered="false" style="background: #0f172a; color: #f8fafc">
           <p class="text-sm uppercase tracking-[0.35em] text-slate-400">状态</p>
           <p class="mt-3 text-lg font-semibold">
             {{ isAuthed ? '已登录' : '未登录' }}
@@ -83,30 +92,23 @@ const navigateTo = () => {
             <span class="h-2 w-2 rounded-full" :class="statusTone"></span>
             {{ state.status.message || '准备就绪，等待你的操作。' }}
           </p>
-        </div>
+        </a-card>
       </section>
 
-      <section
-        class="reveal reveal-delay-3 rounded-3xl border border-white/60 bg-white/80 p-6 shadow-2xl shadow-slate-200/70 backdrop-blur"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Access</p>
-            <h2 class="mt-2 font-display text-2xl font-semibold text-slate-900">
-              {{ isAuthed ? '账户信息' : '登录' }}
-            </h2>
+      <section class="reveal reveal-delay-3">
+        <a-card :bordered="false" class="backdrop-blur">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm uppercase tracking-[0.3em] text-slate-400">入口</p>
+              <h2 class="mt-2 font-display text-2xl font-semibold text-slate-900">
+                {{ isAuthed ? '账号信息' : '登录' }}
+              </h2>
+            </div>
+            <a-button v-if="isAuthed" type="outline" shape="round" @click="logout">退出</a-button>
           </div>
-          <button
-            v-if="isAuthed"
-            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-900"
-            type="button"
-            @click="logout"
-          >
-            退出
-          </button>
-        </div>
 
-        <router-view class="mt-6" />
+          <router-view class="mt-6" />
+        </a-card>
       </section>
     </main>
   </div>

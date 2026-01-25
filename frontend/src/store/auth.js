@@ -1,4 +1,5 @@
 import { computed, reactive } from 'vue'
+import client from '../api/client'
 
 const state = reactive({
   token: localStorage.getItem('auth_token') || '',
@@ -6,15 +7,6 @@ const state = reactive({
   status: { type: '', message: '' },
   isLoading: false,
 })
-
-const apiBase = import.meta.env.VITE_API_BASE || ''
-
-const buildUrl = (path) => {
-  if (!apiBase) {
-    return path
-  }
-  return `${apiBase.replace(/\/$/, '')}${path}`
-}
 
 const isAuthed = computed(() => state.token.length > 0)
 
@@ -30,18 +22,14 @@ const login = async (username, password) => {
   clearStatus()
   state.isLoading = true
   try {
-    const response = await fetch(buildUrl('/auth/login'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
+    const response = await client.post('/auth/login', { username, password })
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       setStatus('error', '登录失败，请检查账号或密码。')
       return false
     }
 
-    const data = await response.json()
+    const data = response.data
     state.token = data.access_token || ''
     if (!state.token) {
       setStatus('error', '未获取到访问令牌。')
@@ -65,13 +53,11 @@ const loadProfile = async () => {
   }
   state.isLoading = true
   try {
-    const response = await fetch(buildUrl('/protected/me'), {
-      headers: {
-        Authorization: `Bearer ${state.token}`,
-      },
+    const response = await client.get('/protected/me', {
+      headers: { Authorization: `Bearer ${state.token}` },
     })
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       state.token = ''
       localStorage.removeItem('auth_token')
       state.profile = null
@@ -79,7 +65,7 @@ const loadProfile = async () => {
       return false
     }
 
-    state.profile = await response.json()
+    state.profile = response.data
     setStatus('success', '已获取个人信息。')
     return true
   } catch (error) {

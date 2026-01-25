@@ -6,26 +6,14 @@
 pip install -r requirements.txt
 ```
 
-2) 配置环境变量（示例）
-```bash
-set APP_USERNAME=admin
-set APP_PASSWORD=admin
-set JWT_SECRET=change-me
-set JWT_EXPIRE_MINUTES=60
-set LOG_LEVEL=INFO
-```
-
-3) 启动服务
+2) 启动服务
 ```bash
 python -m src.main
 ```
 
 ## 配置文件
-可选配置文件：`config/config.json`（参考 `config/config.example.json`）。
-如需使用配置文件，请设置：
-```bash
-set CONFIG_FILE=config/config.json
-```
+默认读取 `config/config.json`（参考 `config/config.example.json`），包含账号、JWT、日志与大模型相关配置。
+说明：`config/config.json` 用于本地手动配置（不会提交到仓库）。
 
 ## API 示例
 - `GET /health`
@@ -34,7 +22,10 @@ set CONFIG_FILE=config/config.json
 {"username":"admin","password":"admin"}
 ```
 - `GET /protected/me`（需 `Authorization: Bearer <token>`）
-
+- `POST /agent`，Body：
+```json
+{"task":"根据资料整理要点并给出结论"}
+```
 
 ## 前端（Vue + Vite）
 1) 安装依赖
@@ -58,18 +49,17 @@ set VITE_API_BASE=http://127.0.0.1:8000
 npm run build
 ```
 
-## 智能体配置
-新增环境变量示例：
-```bash
-set LLM_PROVIDER=openai
-set LLM_API_KEY=your-key
-set LLM_MODEL=gpt-4o-mini
-set LLM_BASE_URL=
-set LLM_TIMEOUT_SECONDS=60
-```
-
-## 智能体接口
-- `POST /agent`，Body：
+## 前端配置文件（可选）
+可以在 `frontend/public/app-config.json` 中配置运行时参数（参考 `frontend/public/app-config.example.json`）。示例：
 ```json
-{"task":"根据资料整理要点并给出结论"}
+{
+  "apiBase": "http://127.0.0.1:8000"
+}
 ```
+未提供时会回退到 `VITE_API_BASE` 环境变量。
+
+## 前端智能体对话
+启动前端后，登录进入界面，点击“智能体对话”进入多轮对话页面。
+
+## 本地检索数据
+将文本资料放入 `data/` 目录（支持 `.txt`、`.md`），智能体会进行关键词检索并在命中时作为上下文使用。
