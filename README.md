@@ -57,3 +57,19 @@ set VITE_API_BASE=http://127.0.0.1:8000
 ```bash
 npm run build
 ```
+
+## 智能体配置
+新增环境变量示例：
+```bash
+set LLM_PROVIDER=openai
+set LLM_API_KEY=your-key
+set LLM_MODEL=gpt-4o-mini
+set LLM_BASE_URL=
+set LLM_TIMEOUT_SECONDS=60
+```
+
+## 智能体接口
+- `POST /agent`，Body：
+```json
+{"task":"根据资料整理要点并给出结论"}
+```

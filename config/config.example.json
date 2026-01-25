@@ -4,5 +4,10 @@
   "jwt_secret": "change-me",
   "jwt_algorithm": "HS256",
   "jwt_expire_minutes": 60,
-  "log_level": "INFO"
+  "log_level": "INFO",
+  "llm_provider": "openai",
+  "llm_api_key": "",
+  "llm_model": "gpt-4o-mini",
+  "llm_base_url": "",
+  "llm_timeout_seconds": 60
 }
