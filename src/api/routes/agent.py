@@ -12,6 +12,7 @@ router = APIRouter()
 
 class AgentRequest(BaseModel):
     task: str
+    session_id: str | None = None
 
 
 class TraceEntryModel(BaseModel):
@@ -32,12 +33,13 @@ class AgentResponse(BaseModel):
     sources: list[str]
     trace: list[TraceEntryModel]
     actions: list[ActionResultModel]
+    session_id: str
 
 
 @router.post("/agent", response_model=AgentResponse)
 def run_agent(payload: AgentRequest, runner: AgentRunner = Depends(get_agent_runner)) -> AgentResponse:
     try:
-        result = runner.run(payload.task)
+        result = runner.run(payload.task, payload.session_id)
     except ProviderConfigError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except ValueError as exc:
@@ -50,4 +52,5 @@ def run_agent(payload: AgentRequest, runner: AgentRunner = Depends(get_agent_run
         sources=result.sources,
         trace=[TraceEntryModel(**asdict(entry)) for entry in result.trace],
         actions=[ActionResultModel(**asdict(item)) for item in result.actions],
+        session_id=result.session_id,
     )

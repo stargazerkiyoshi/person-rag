@@ -40,10 +40,32 @@ TBD - created by archiving change add-chatgpt-qa-chain. Update Purpose after arc
 - **WHEN** 动作执行失败
 - **THEN** 结果说明失败原因并记录到执行轨迹
 
+#### Scenario: 未触发检索
+- **WHEN** 模型判断无需检索即可回答
+- **THEN** 系统跳过检索并返回纯对话结果
+
+#### Scenario: 触发检索
+- **WHEN** 模型判断需要资料支撑
+- **THEN** 系统执行检索并返回来源与轨迹
+
 ### Requirement: 模型响应解析
 系统 SHALL 解析模型返回的 JSON 内容，并在出现额外文本时从中提取 JSON 片段。
 
 #### Scenario: 含多余文本的响应
 - **WHEN** 模型返回包含额外文本与 JSON 内容
 - **THEN** 系统提取 JSON 片段并完成解析
+
+### Requirement: 会话标识返回
+系统 SHALL 在首次请求未提供 session_id 时生成并在响应中返回 session_id。
+
+#### Scenario: 会话标识返回
+- **WHEN** 客户端首次请求未提供 session_id
+- **THEN** 系统生成 session_id 并在响应中返回
+
+### Requirement: 会话上下文记忆
+系统 SHALL 使用 SQLite 持久化会话历史，并在生成回复时仅使用最近 N 轮对话。
+
+#### Scenario: 使用最近对话
+- **WHEN** 会话中存在多轮历史
+- **THEN** 系统仅使用最近 N 轮作为上下文
 

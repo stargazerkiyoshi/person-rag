@@ -12,7 +12,7 @@ python -m src.main
 ```
 
 ## 配置文件
-默认读取 `config/config.json`（参考 `config/config.example.json`），包含账号、JWT、日志与大模型相关配置。
+默认读取 `config/config.json`（参考 `config/config.example.json`），包含账号、JWT、日志与大模型相关配置。  
 说明：`config/config.json` 用于本地手动配置（不会提交到仓库）。
 
 ## API 示例
@@ -24,7 +24,7 @@ python -m src.main
 - `GET /protected/me`（需 `Authorization: Bearer <token>`）
 - `POST /agent`，Body：
 ```json
-{"task":"根据资料整理要点并给出结论"}
+{"task":"根据资料整理要点并给出结论","session_id":"可选"}
 ```
 
 ## 前端（Vue + Vite）
@@ -63,3 +63,9 @@ npm run build
 
 ## 本地检索数据
 将文本资料放入 `data/` 目录（支持 `.txt`、`.md`），智能体会进行关键词检索并在命中时作为上下文使用。
+
+## 检索触发策略
+智能体会先判断是否需要检索资料：普通对话直接回复；疑似需要资料时才触发检索，并在返回结果中附带来源与执行轨迹。
+
+## 多轮会话
+后端会生成 session_id 并在首次响应中返回。前端会自动携带 session_id 进行多轮对话。

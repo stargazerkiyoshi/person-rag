@@ -19,6 +19,8 @@ class Settings:
     llm_model: str
     llm_base_url: str
     llm_timeout_seconds: int
+    session_db_path: str
+    session_max_rounds: int
 
 
 def _load_config_file(path: str) -> dict:
@@ -61,5 +63,10 @@ def load_settings() -> Settings:
         llm_timeout_seconds=_get_int(
             os.getenv("LLM_TIMEOUT_SECONDS"),
             int(config.get("llm_timeout_seconds", 60)),
+        ),
+        session_db_path=os.getenv("SESSION_DB_PATH", config.get("session_db_path", "data/sessions.db")),
+        session_max_rounds=_get_int(
+            os.getenv("SESSION_MAX_ROUNDS"),
+            int(config.get("session_max_rounds", 6)),
         ),
     )

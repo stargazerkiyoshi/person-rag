@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
 from typing import Iterable, Protocol
 
 
@@ -27,7 +28,7 @@ class LocalKeywordRetriever:
         self._extensions = tuple(extensions or (".txt", ".md"))
 
     def retrieve(self, query: str, top_k: int) -> list[Chunk]:
-        keywords = [token for token in query.lower().split() if token]
+        keywords = self._tokenize(query)
         if not keywords:
             return []
 
@@ -65,3 +66,26 @@ class LocalKeywordRetriever:
     def _split_blocks(self, text: str) -> list[str]:
         blocks = [block.strip() for block in text.split("\n\n") if block.strip()]
         return blocks
+
+    def _tokenize(self, query: str) -> list[str]:
+        query = query.strip()
+        if not query:
+            return []
+
+        tokens: list[str] = []
+        for match in re.findall(r"[a-zA-Z0-9]+|[\u4e00-\u9fff]+", query):
+            if re.fullmatch(r"[a-zA-Z0-9]+", match):
+                tokens.append(match.lower())
+                continue
+            if len(match) == 1:
+                tokens.append(match)
+                continue
+            tokens.extend(match[idx : idx + 2] for idx in range(len(match) - 1))
+
+        deduped = []
+        seen = set()
+        for token in tokens:
+            if token not in seen:
+                deduped.append(token)
+                seen.add(token)
+        return deduped

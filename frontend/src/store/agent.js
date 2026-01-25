@@ -5,6 +5,7 @@ const state = reactive({
   messages: [],
   status: { type: '', message: '' },
   isLoading: false,
+  sessionId: '',
 })
 
 const setStatus = (type, message) => {
@@ -28,7 +29,10 @@ const sendTask = async (task) => {
   _pushMessage({ role: 'user', content: task })
   state.isLoading = true
   try {
-    const response = await client.post('/agent', { task })
+    const response = await client.post('/agent', {
+      task,
+      session_id: state.sessionId || null,
+    })
 
     if (response.status !== 200) {
       let errorMessage = '智能体请求失败，请稍后重试。'
@@ -41,6 +45,9 @@ const sendTask = async (task) => {
     }
 
     const data = response.data
+    if (data.session_id) {
+      state.sessionId = data.session_id
+    }
     _pushMessage({
       role: 'agent',
       content: data.result,
@@ -67,6 +74,7 @@ const sendTask = async (task) => {
 
 const clearConversation = () => {
   state.messages = []
+  state.sessionId = ''
   clearStatus()
 }
 

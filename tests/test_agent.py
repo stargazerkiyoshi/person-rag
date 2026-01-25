@@ -10,7 +10,7 @@ from src.main import create_app
 
 
 class FakeRunner:
-    def run(self, task: str) -> AgentResult:
+    def run(self, task: str, session_id: str | None = None) -> AgentResult:
         trace = [
             TraceEntry(
                 step="retrieve",
@@ -20,11 +20,11 @@ class FakeRunner:
             )
         ]
         actions = [ActionResult(name="save_note", status="success", detail="data/agent_notes.txt")]
-        return AgentResult(result="ok", sources=["source-a"], trace=trace, actions=actions)
+        return AgentResult(result="ok", sources=["source-a"], trace=trace, actions=actions, session_id="s1")
 
 
 class FailingRunner:
-    def run(self, task: str) -> AgentResult:
+    def run(self, task: str, session_id: str | None = None) -> AgentResult:
         raise ProviderConfigError("未配置 LLM_API_KEY")
 
 
@@ -37,6 +37,7 @@ def test_agent_success() -> None:
     data = response.json()
     assert data["result"] == "ok"
     assert data["sources"] == ["source-a"]
+    assert data["session_id"] == "s1"
     assert data["trace"][0]["step"] == "retrieve"
     assert data["actions"][0]["name"] == "save_note"
 
