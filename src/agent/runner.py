@@ -8,7 +8,12 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from src.agent.actions import ActionExecutor, ActionResult
 from src.agent.providers import LlmProvider
-from src.agent.retriever import Chunk, KnowledgeRetriever, LocalKeywordRetriever
+from src.agent.retriever import (
+    Chunk,
+    ChromaVectorRetriever,
+    KnowledgeRetriever,
+    LocalKeywordRetriever,
+)
 from src.agent.sessions import SessionStore, format_history
 from src.core.config import Settings
 
@@ -209,4 +214,13 @@ def build_agent_runner(settings: Settings) -> AgentRunner:
 
     provider = build_provider(settings)
     sessions = SessionStore(settings.session_db_path, settings.session_max_rounds)
-    return AgentRunner(provider=provider, retriever=LocalKeywordRetriever("data"), sessions=sessions)
+    retriever_type = settings.retriever_type.lower()
+    if retriever_type == "chroma":
+        retriever: KnowledgeRetriever = ChromaVectorRetriever(
+            chroma_path=settings.chroma_path,
+            collection_name=settings.chroma_collection,
+            embedding_model=settings.embedding_model,
+        )
+    else:
+        retriever = LocalKeywordRetriever(settings.data_dir)
+    return AgentRunner(provider=provider, retriever=retriever, sessions=sessions)

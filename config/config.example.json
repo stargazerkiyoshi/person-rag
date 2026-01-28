@@ -10,6 +10,11 @@
   "llm_model": "gpt-4o-mini",
   "llm_base_url": "",
   "llm_timeout_seconds": 60,
+  "retriever_type": "keyword",
+  "data_dir": "data",
+  "chroma_path": "data/chroma",
+  "chroma_collection": "knowledge",
+  "embedding_model": "BAAI/bge-m3",
   "session_db_path": "data/sessions.db",
   "session_max_rounds": 6
 }

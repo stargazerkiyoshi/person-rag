@@ -89,3 +89,47 @@ class LocalKeywordRetriever:
                 deduped.append(token)
                 seen.add(token)
         return deduped
+
+
+class ChromaVectorRetriever:
+    def __init__(
+        self,
+        chroma_path: Path | str,
+        collection_name: str,
+        embedding_model: str,
+    ) -> None:
+        try:
+            import chromadb
+            from sentence_transformers import SentenceTransformer
+        except ImportError as exc:
+            raise ImportError(
+                "Missing vector dependencies. Install chromadb and sentence-transformers."
+            ) from exc
+
+        self._client = chromadb.PersistentClient(path=str(chroma_path))
+        self._collection = self._client.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"},
+        )
+        self._model = SentenceTransformer(embedding_model)
+
+    def retrieve(self, query: str, top_k: int) -> list[Chunk]:
+        query = query.strip()
+        if not query:
+            return []
+
+        embedding = self._model.encode([query], normalize_embeddings=True).tolist()[0]
+        results = self._collection.query(
+            query_embeddings=[embedding],
+            n_results=top_k,
+            include=["documents", "metadatas"],
+        )
+        documents = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        chunks: list[Chunk] = []
+        for document, metadata in zip(documents, metadatas):
+            source = ""
+            if isinstance(metadata, dict):
+                source = str(metadata.get("source", ""))
+            chunks.append(Chunk(text=str(document), source=source))
+        return chunks

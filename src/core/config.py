@@ -19,6 +19,11 @@ class Settings:
     llm_model: str
     llm_base_url: str
     llm_timeout_seconds: int
+    retriever_type: str
+    data_dir: str
+    chroma_path: str
+    chroma_collection: str
+    embedding_model: str
     session_db_path: str
     session_max_rounds: int
 
@@ -64,6 +69,11 @@ def load_settings() -> Settings:
             os.getenv("LLM_TIMEOUT_SECONDS"),
             int(config.get("llm_timeout_seconds", 60)),
         ),
+        retriever_type=os.getenv("RETRIEVER_TYPE", config.get("retriever_type", "keyword")),
+        data_dir=os.getenv("DATA_DIR", config.get("data_dir", "data")),
+        chroma_path=os.getenv("CHROMA_PATH", config.get("chroma_path", "data/chroma")),
+        chroma_collection=os.getenv("CHROMA_COLLECTION", config.get("chroma_collection", "knowledge")),
+        embedding_model=os.getenv("EMBEDDING_MODEL", config.get("embedding_model", "BAAI/bge-m3")),
         session_db_path=os.getenv("SESSION_DB_PATH", config.get("session_db_path", "data/sessions.db")),
         session_max_rounds=_get_int(
             os.getenv("SESSION_MAX_ROUNDS"),
