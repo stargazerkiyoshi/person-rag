@@ -1,4 +1,4 @@
-.venv/
+﻿.venv/
 myvenv/
 __pycache__/
 *.pyc
@@ -12,6 +12,10 @@ htmlcov/
 .env
 *.log
 
+node_modules/
+dist/
+
+# Local data
 data/
 config/config.json
 

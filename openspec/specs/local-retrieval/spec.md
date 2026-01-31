@@ -11,7 +11,7 @@ TBD - created by archiving change add-local-retrieval. Update Purpose after arch
 - **THEN** 系统可加载其内容用于检索
 
 ### Requirement: 关键词检索
-系统 SHALL 使用关键词匹配检索本地资料，并返回 top-k 片段。
+系统 SHALL 支持关键词匹配检索本地资料，并返回 top-k 片段；当配置为关键词检索时使用该策略。
 
 #### Scenario: 命中关键词
 - **WHEN** 查询关键词命中资料内容
@@ -20,6 +20,10 @@ TBD - created by archiving change add-local-retrieval. Update Purpose after arch
 #### Scenario: 无匹配
 - **WHEN** 查询关键词未命中任何资料
 - **THEN** 返回空结果
+
+#### Scenario: 配置选择关键词检索
+- **WHEN** 配置选择关键词检索
+- **THEN** 使用关键词匹配检索策略
 
 ### Requirement: 智能体检索接入
 系统 SHALL 将本地检索结果接入智能体流程。

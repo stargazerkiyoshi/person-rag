@@ -1,0 +1,27 @@
+{
+  "name": "person-rag",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "cli": "node dist/cli.js",
+    "test": "npm run build && node --test dist/tests/*.test.js"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.1.17",
+    "@langchain/openai": "^1.2.3",
+    "fastify": "^4.27.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.11.30",
+    "@types/pg": "^8.11.6",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}

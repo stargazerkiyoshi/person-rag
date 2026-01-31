@@ -1,20 +1,20 @@
-{
+﻿{
   "app_username": "admin",
   "app_password": "admin",
   "jwt_secret": "change-me",
   "jwt_algorithm": "HS256",
   "jwt_expire_minutes": 60,
-  "log_level": "INFO",
+  "log_level": "info",
   "llm_provider": "openai",
   "llm_api_key": "your-key",
   "llm_model": "gpt-4o-mini",
   "llm_base_url": "",
   "llm_timeout_seconds": 60,
-  "retriever_type": "keyword",
+  "embedding_model": "text-embedding-3-small",
+  "embedding_dimensions": 1536,
   "data_dir": "data",
-  "chroma_path": "data/chroma",
-  "chroma_collection": "knowledge",
-  "embedding_model": "BAAI/bge-m3",
-  "session_db_path": "data/sessions.db",
-  "session_max_rounds": 6
+  "session_max_rounds": 6,
+  "database_url": "postgres://postgres:postgres@127.0.0.1:5432/person_rag",
+  "pgvector_table": "documents",
+  "retriever_top_k": 5
 }
